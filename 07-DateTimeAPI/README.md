@@ -1,6 +1,12 @@
 # Date Time API (java.time) - Comprehensive Guide
 
 ## 📚 Table of Contents
+- [Learning Objectives](#learning-objectives)
+- [Theory Checkpoints](#theory-checkpoints)
+- [Run Steps](#run-steps)
+- [Verification Steps](#verification-steps)
+- [Expected Outcome](#expected-outcome)
+- [Hands-on Lab](#hands-on-lab)
 - [Introduction](#introduction)
 - [Problems with Old Date API](#problems-with-old-date-api)
 - [Core Classes Overview](#core-classes-overview)
@@ -11,6 +17,286 @@
 - [Period and Duration](#period-and-duration)
 - [Formatting and Parsing](#formatting-and-parsing)
 - [Quick Reference Card](#quick-reference-card)
+
+---
+
+## 🎯 Learning Objectives
+
+After completing this module, you will:
+
+- [ ] Understand why the old Date API was problematic (mutable, thread-unsafe, confusing)
+- [ ] Master the 5 core classes: LocalDate, LocalTime, LocalDateTime, ZonedDateTime, Instant
+- [ ] Distinguish between LocalDateTime (timezone-agnostic) and ZonedDateTime (timezone-aware)
+- [ ] Perform date/time operations: adding days, checking ranges, finding
+- [ ] Understand Period (date-based) vs Duration (time-based) for differences
+- [ ] Format and parse dates using DateTimeFormatter
+- [ ] Apply timezone handling correctly for global applications
+- [ ] Use java.time effectively in production code
+
+---
+
+## ✅ Theory Checkpoints
+
+**Q1: Why is LocalDateTime preferred over the old Date class?**
+
+A: LocalDateTime is immutable (thread-safe), clear about what it represents, and has a sensible API. The old Date class was mutable, confusing (getMonth() returns 0-11), and represented both local time AND UTC differently than expected.
+
+**Q2: When would you use LocalDateTime vs ZonedDateTime?**
+
+A: LocalDateTime for times without timezone context (alarms, appointments). ZonedDateTime when timezone matters (distributed systems, scheduling across regions). ZonedDateTime handles DayLight Saving Time automatically.
+
+**Q3: What's the difference between Period and Duration?**
+
+A: Period represents date-based differences (X days, months, years). Duration represents time-based differences (hours, minutes, seconds, nanoseconds). Period for dates, Duration for time.
+
+**Q4: Why was getMonth() returning 0-11 problematic in old Date API?**
+
+A: It's unintuitive. January = 0, December = 11. Easy mistake to make "month + 1" confusion. New API returns Month enum (JANUARY is JANUARY, not 0).
+
+**Q5: How does ZonedDateTime handle Daylight Saving Time?**
+
+A: Automatically. When you create or manipulate ZonedDateTime, it accounts for DST rules of that zone. When converting between zones, it correctly adjusts. This was error-prone in old APIs.
+
+---
+
+## 🚀 Run Steps
+
+### Compile and Run the Demo
+
+**Step 1:** Navigate to the module directory
+```bash
+cd 07-DateTimeAPI
+```
+
+**Step 2:** Compile the Java file
+```bash
+javac DateTimeAPI.java
+```
+
+**Step 3:** Run the demo
+```bash
+java DateTimeAPI
+```
+
+### Alternative: Using IDE
+
+If using an IDE (IntelliJ, Eclipse, VS Code):
+1. Open `DateTimeAPI.java`
+2. Click the "Run" button (or press `Shift+F10` in IntelliJ)
+3. Output appears in the console
+
+---
+
+## ✅ Verification Steps
+
+**Expected behavior after running:**
+1. Program compiles without errors
+2. Output displays current date, time, and datetime
+3. Date/time arithmetic operations show results
+4. Formatting examples display readable date strings
+5. Timezone handling works properly
+6. No exceptions for valid date operations
+
+**Troubleshooting:**
+- **Error: "Package java.time not found"**
+  - Solution: Ensure Java 8+ is being used. java.time was added in Java 8.
+- **Timezone-related errors**
+  - Solution: Verify system timezone is set correctly. Use `ZoneId.of("UTC")` for explicit zones.
+- **No output for formatting**
+  - Solution: Check DateTimeFormatter syntax is correct
+
+---
+
+## 📊 Expected Outcome
+
+When you run `DateTimeAPI.java`, you should see output organized by date/time type:
+
+```
+=== DATE TIME API DEMO ===
+
+--- LocalDate Examples ---
+[Current date, date arithmetic, comparisons]
+
+--- LocalTime Examples ---
+[Current time, time operations]
+
+--- LocalDateTime Examples ---
+[Combined date and time]
+
+--- ZonedDateTime Examples ---
+[Multiple timezones, DST handling]
+
+--- Period and Duration ---
+[Date/time differences]
+
+--- Formatting and Parsing ---
+[Custom date/time formats]
+
+--- Practical Examples ---
+[Real-world usage patterns]
+```
+
+Key characteristics:
+- Clear, readable date/time representations
+- All operations execute without errors
+- Timezone handling works correctly
+- Formatted output is user-friendly
+
+---
+
+## 📚 Hands-on Lab
+
+### Exercise 1: Guided — Create and Manipulate Dates [Beginner]
+
+**Task:** Work with LocalDate for basic date operations.
+
+**Given:**
+```java
+// Create dates
+LocalDate today = LocalDate.now();
+LocalDate birthday = LocalDate.of(1990, 5, 15);
+
+// Add days
+LocalDate nextWeek = today.plusDays(7);
+
+// Compare
+if (today.isBefore(nextWeek)) {
+    System.out.println("Today is before next week");
+}
+
+// Get components
+int year = today.getYear();
+Month month = today.getMonth();
+int day = today.getDayOfMonth();
+```
+
+**Your Task:** Create a date 100 days from now and print it:
+```java
+LocalDate today = LocalDate.now();
+LocalDate future = today.???;
+
+System.out.println(future);
+// Expected: Date 100 days from now
+```
+
+**Hint:** Use `plusDays()` method
+
+---
+
+### Exercise 2: Semi-Guided — Work with Timezones [Intermediate]
+
+**Task:** Create ZonedDateTime in different timezones.
+
+**Given:**
+```java
+ZoneId tokyo = ZoneId.of("Asia/Tokyo");
+ZoneId london = ZoneId.of("Europe/London");
+
+LocalDateTime dateTime = LocalDateTime.now();
+
+// Create zoned versions
+ZonedDateTime tokyoTime = dateTime.atZone(tokyo);
+ZonedDateTime londonTime = dateTime.atZone(london);
+
+System.out.println(tokyoTime);
+System.out.println(londonTime);
+```
+
+**Your Task:** Create current time in New York timezone and print it:
+```java
+ZoneId newyork = ZoneId.of("???");
+ZonedDateTime nyTime = LocalDateTime.now().atZone(???);
+
+System.out.println(nyTime);
+// Expected: Current time in New York with timezone
+```
+
+**Hint:** `"America/New_York"` and use `atZone()`
+
+---
+
+### Exercise 3: Challenge — Calculate Age from Birthday [Advanced]
+
+**Task:** Calculate exact age from a birthday using Period.
+
+**Challenge Code:**
+```java
+LocalDate birthday = LocalDate.of(1990, 5, 15);
+LocalDate today = LocalDate.now();
+
+Period age = Period.between(birthday, today);
+
+System.out.println(age.getYears() + " years, " +
+                    age.getMonths() + " months, " +
+                    age.getDays() + " days old");
+// Expected: X years, Y months, Z days old
+```
+
+**Your Challenge:** Create a program that:
+1. Defines a birthday
+2. Calculates age using Period
+3. Determines if birthday is coming up this year
+4. Calculates days until next birthday
+
+```java
+LocalDate birthday = LocalDate.of(1995, 12, 25);
+LocalDate today = LocalDate.now();
+
+// Current age
+Period age = Period.between(birthday, today);
+int years = age.getYears();
+
+// Next birthday this year
+LocalDate nextBirthday = birthday.withYear(today.getYear());
+if (nextBirthday.isBefore(today)) {
+    nextBirthday = nextBirthday.plusYears(1);
+}
+
+// Days until
+Long daysUntil = ChronoUnit.DAYS.between(today, nextBirthday);
+
+System.out.println("Age: " + years);
+System.out.println("Days until birthday: " + daysUntil);
+```
+
+---
+
+## 🎨 Architecture Diagram
+
+**java.time Package Structure:**
+
+```mermaid
+graph TD
+    A["java.time Package"] --> B["LocalDate<br/>Date only<br/>No time, No zone"]
+    A --> C["LocalTime<br/>Time only<br/>No date, No zone"]
+    A --> D["LocalDateTime<br/>Date + Time<br/>No zone"]
+    A --> E["ZonedDateTime<br/>Date + Time + Zone<br/>Timezone aware"]
+    A --> F["Instant<br/>Machine time<br/>UTC seconds"]
+    
+    A --> G["Period<br/>Date difference<br/>Days/Months/Years"]
+    A --> H["Duration<br/>Time difference<br/>Hours/Mins/Secs"]
+    
+    style B fill:#c8e6c9
+    style C fill:#bbdefb
+    style D fill:#fff9c4
+    style E fill:#ffccbc
+    style F fill:#f8bbd0
+    style G fill:#ffe0b2
+    style H fill:#e1bee7
+```
+
+**LocalDateTime vs ZonedDateTime:**
+
+```mermaid
+graph LR
+    A["LocalDateTime<br/>2024-12-25 15:30:00<br/>No timezone"] --> B{"Add Timezone?"}
+    B -->|Yes| C["ZonedDateTime<br/>2024-12-25 15:30:00+09:00[Asia/Tokyo]"] 
+    B -->|No| D["Stay Local<br/>Ambiguous across zones"]
+    
+    style A fill:#fff9c4
+    style C fill:#ffccbc
+    style D fill:#ffccbc
+```
 
 ---
 
@@ -390,10 +676,20 @@ ZonedDateTime parisTime = ZonedDateTime.of(
     2023, 12, 25, 14, 30, 0, 0,
     ZoneId.of("Europe/Paris")
 );
-
 // Convert to another zone
 ZonedDateTime tokyoTime = parisTime.withZoneSameInstant(ZoneId.of("Asia/Tokyo"));
-ZonedDateTime nyTime = parisTime.withZoneSameInstant(ZoneId.of("America/New_York"));
+## 📋 Prerequisites & Next Topics
+
+### Prerequisites
+- No Java 8 prerequisites required
+- Basic Java date/time understanding (helpful)
+
+### Next Topics
+After mastering Date & Time API, proceed to:
+1. **[Module 08 - Collectors](../08-Collectors/README.md)** — Works well with date/time streams
+2. **[Module 12 - forEach Iteration](../12-ForEachAndIteration/README.md)** — Iterate over dates/times
+3. **[Module 13 - Java 8 Revision](../13-Java8Revision/README.md)** — Capstone: integrate all concepts
+
 
 System.out.println("Paris:  " + parisTime);   // 14:30 in Paris
 System.out.println("Tokyo:  " + tokyoTime);   // 22:30 in Tokyo

@@ -72,6 +72,8 @@ public class StreamsAPI {
         
         // From collection
         List<String> list = Arrays.asList("A", "B", "C");
+                // Why: stream() creates a lazy pipeline, not eager computation.
+                // Streams are views over data sources—nothing executes until a terminal operation.
         Stream<String> stream1 = list.stream();
         System.out.println("From list: " + stream1.collect(Collectors.toList()));
         
@@ -89,10 +91,14 @@ public class StreamsAPI {
         System.out.println("Random numbers: " + randomStream.collect(Collectors.toList()));
         
         // Using Stream.iterate() - infinite stream
+        // Why: iterate() and generate() return infinite streams. limit() truncates. This is
+        // powerful because streams are lazy—infinite streams are practical only with limiting.
         Stream<Integer> evenNumbers = Stream.iterate(0, n -> n + 2).limit(5);
         System.out.println("Even numbers: " + evenNumbers.collect(Collectors.toList()));
         
         // Using IntStream, LongStream, DoubleStream
+        // Why: Primitive streams avoid boxing overhead. Use IntStream.range() for loops,
+        // mapToInt() to convert object streams to primitives for calculation efficiency.
         IntStream intStream = IntStream.range(1, 6);
         System.out.println("IntStream range: " + intStream.boxed().collect(Collectors.toList()));
         
@@ -111,12 +117,16 @@ public class StreamsAPI {
         List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         
         // Filter: Get even numbers
+        // Why: filter() is an intermediate operation—it returns a stream without executing.
+        // Only when collect() (terminal op) is called does filtering actually happen.
         List<Integer> evenNumbers = numbers.stream()
                 .filter(n -> n % 2 == 0)
                 .collect(Collectors.toList());
         System.out.println("Even numbers: " + evenNumbers);
         
         // Map: Square each number
+        // Why: map() transforms each element. Unlike filter, it changes type/value.
+        // Composable: map() returns Stream<Integer> so you can chain more operations.
         List<Integer> squares = numbers.stream()
                 .map(n -> n * n)
                 .collect(Collectors.toList());
@@ -163,6 +173,8 @@ public class StreamsAPI {
             Arrays.asList(7, 8, 9)
         );
         
+                // Why: flatMap(list -> list.stream()) converts Stream<List<Integer>>
+                // to Stream<Integer>. It's "map then flatten"—essential for nested structures.
         List<Integer> flattened = nestedList.stream()
                 .flatMap(list -> list.stream())
                 .collect(Collectors.toList());
@@ -175,6 +187,8 @@ public class StreamsAPI {
             "Functional Programming"
         );
         
+                // Why: Arrays.stream() on each split result. flatMap handles 1-to-many mappings.
+                // Without flatMap, you'd need nested loops to extract all words from all sentences.
         List<String> words = sentences.stream()
                 .flatMap(sentence -> Arrays.stream(sentence.split(" ")))
                 .collect(Collectors.toList());
@@ -216,12 +230,16 @@ public class StreamsAPI {
         System.out.println("Sorted: " + sorted);
         
         // Sort in reverse order
+                // Why: Comparator.reverseOrder() is a static method reference.
+                // sorted() has two forms: sorted() for natural order, sorted(Comparator) for custom.
         List<Integer> sortedDesc = numbers.stream()
                 .sorted(Comparator.reverseOrder())
                 .collect(Collectors.toList());
         System.out.println("Sorted (descending): " + sortedDesc);
         
         // Limit: Get first 5 elements
+                // Why: limit() is critical with infinite streams (generate, iterate).
+                // It also optimizes: stream stops after N elements—doesn't process entire collection.
         List<Integer> limited = numbers.stream()
                 .limit(5)
                 .collect(Collectors.toList());
@@ -262,12 +280,16 @@ public class StreamsAPI {
         List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         
         // Count
+                // Why: count() and other terminal operations trigger stream pipeline execution.
+                // Once you call count(), filter() gets applied (no longer lazy).
         long count = numbers.stream()
                 .filter(n -> n % 2 == 0)
                 .count();
         System.out.println("Count of even numbers: " + count);
         
         // anyMatch: Check if any element matches
+                // Why: anyMatch, allMatch, noneMatch short-circuit. They stop early when answer found.
+                // For large streams, this is more efficient than collecting all matching elements.
         boolean hasEven = numbers.stream()
                 .anyMatch(n -> n % 2 == 0);
         System.out.println("Has even numbers: " + hasEven);
@@ -314,6 +336,8 @@ public class StreamsAPI {
         List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
         
         // Sum using reduce
+                // Why: reduce(identity, accumulator) combines all elements into ONE value.
+                // Identity (0) is returned if stream is empty. Accumulator receives previous+current.
         int sum = numbers.stream()
                 .reduce(0, (a, b) -> a + b);
         System.out.println("Sum: " + sum);
@@ -369,6 +393,8 @@ public class StreamsAPI {
         );
         
         // Total revenue
+                // Why: mapToDouble() converts Sale stream to DoubleStream (primitive).
+                // Primitive streams have sum(), max(), min(), average() for numeric operations.
         double totalRevenue = sales.stream()
                 .mapToDouble(sale -> sale.price * sale.quantity)
                 .sum();
@@ -425,6 +451,8 @@ public class StreamsAPI {
         );
         
         // Calculate average for each student
+                // Why: forEach on outer stream (students), then nested stream on grades.
+                // This is a common pattern: iterate + compute. Could also use CollectorS (grouping).
         System.out.println("\nStudent Averages:");
         students.forEach(student -> {
             double avg = student.grades.stream()
@@ -435,6 +463,8 @@ public class StreamsAPI {
         });
         
         // Students with average > 85
+                // Why: Inside filter(), nested stream recalculates average. Inefficient for large data,
+                // but readable. Production code would cache average in Student object.
         System.out.println("\nHigh Performers (avg > 85%):");
         students.stream()
                 .filter(s -> s.grades.stream().mapToInt(Integer::intValue).average().orElse(0) > 85)
@@ -476,6 +506,8 @@ public class StreamsAPI {
         );
         
         // Count by log level
+                // Why: Collectors.groupingBy partitions stream by classification function (log.level).
+                // Then count() aggregates size per group. A single stream operation replacing loops.
         System.out.println("\nLog Count by Level:");
         logs.stream()
                 .collect(Collectors.groupingBy(
@@ -492,6 +524,8 @@ public class StreamsAPI {
                 .forEach(log -> System.out.println("  " + log.message));
         
         // Check if there are critical errors
+                // Why: anyMatch() short-circuits on first match. With 1000 logs, if error found
+                // at position 100, remaining 900 are never evaluated.
         boolean hasCriticalErrors = logs.stream()
                 .anyMatch(log -> log.level.equals("ERROR") && 
                                log.message.contains("Database"));

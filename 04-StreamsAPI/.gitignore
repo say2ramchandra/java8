@@ -1,0 +1,5 @@
+# Ignore all Java class files
+/JAVA8/**/*.class
+
+# Ignore all .build directories
+/JAVA8/**/.build/

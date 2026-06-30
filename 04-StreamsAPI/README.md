@@ -1,6 +1,12 @@
 # Streams API - Comprehensive Guide
 
 ## 📚 Table of Contents
+- [Learning Objectives](#learning-objectives)
+- [Theory Checkpoints](#theory-checkpoints)
+- [Run Steps](#run-steps)
+- [Verification Steps](#verification-steps)
+- [Expected Outcome](#expected-outcome)
+- [Hands-on Lab](#hands-on-lab)
 - [Introduction](#introduction)
 - [What is a Stream?](#what-is-a-stream)
 - [Stream Pipeline Architecture](#stream-pipeline-architecture)
@@ -11,6 +17,273 @@
 - [Advanced Patterns](#advanced-patterns)
 - [Performance Considerations](#performance-considerations)
 - [Quick Reference Card](#quick-reference-card)
+
+---
+
+## 🎯 Learning Objectives
+
+After completing this module, you will:
+
+- [ ] Understand what Streams are and how they differ from collections
+- [ ] Master stream pipeline architecture (source → intermediate → terminal)
+- [ ] Learn lazy evaluation and distinguish intermediate vs terminal operations
+- [ ] Apply common stream operations: filter, map, flatMap, sorted, distinct
+- [ ] Understand terminal operations and their return types
+- [ ] Recognize stateful vs stateless operations
+- [ ] Write efficient, readable functional stream pipelines
+- [ ] Understand short-circuiting and its performance benefits
+
+---
+
+## ✅ Theory Checkpoints
+
+**Q1: What's the fundamental difference between a Collection and a Stream?**
+
+A: Collections are data structures that store data in memory. Streams are pipelines that process data on-demand without storing it. Streams are lazy (operations don't execute until a terminal operation is called).
+
+**Q2: Why are Streams called "lazy"?**
+
+A: Intermediate operations (filter, map, sorted) don't execute immediately. They're only executed when a terminal operation (forEach, collect, reduce) is invoked. This allows for optimization (short-circuiting, filtering early).
+
+**Q3: What's the difference between intermediate and terminal operations?**
+
+A: Intermediate operations return a Stream, allowing chaining; they're lazy. Terminal operations return a result (not a Stream) and trigger execution of the pipeline (for example: collect, forEach, reduce, count).
+
+**Q4: What does "stateless" vs "stateful" mean for stream operations?**
+
+A: Stateless ops (filter, map) don't depend on other elements. Stateful ops (sorted, distinct) need to see all/multiple elements. Stateful operations can't be parallelized as easily.
+
+**Q5: What's the gotcha with mutating shared state inside stream operations?**
+
+A: Stream operations should be non-interfering (not modify the source collection). Using lambda side effects to modify collections during stream processing is dangerous, especially with parallel streams. Use collect() instead.
+
+---
+
+## 🚀 Run Steps
+
+### Compile and Run the Demo
+
+**Step 1:** Navigate to the module directory
+```bash
+cd 04-StreamsAPI
+```
+
+**Step 2:** Compile the Java file
+```bash
+javac StreamsAPI.java
+```
+
+**Step 3:** Run the demo
+```bash
+java StreamsAPI
+```
+
+### Alternative: Using IDE
+
+If using an IDE (IntelliJ, Eclipse, VS Code):
+1. Open `StreamsAPI.java`
+2. Click the "Run" button (or press `Shift+F10` in IntelliJ)
+3. Output appears in the console
+
+---
+
+## ✅ Verification Steps
+
+**Expected behavior after running:**
+1. Program compiles without errors
+2. Output demonstrates various stream operations
+3. All operation categories show output (filter, map, sorting, collecting)
+4. No exceptions thrown
+5. Output is clearly labeled for each demo section
+
+**Troubleshooting:**
+- **Error: "Stream closed" or "cannot reuse stream"**
+  - Solution: Remember that streams can only be traversed once. Create a new stream if needed.
+- **No output for some operations**
+  - Solution: Verify terminal operation exists (forEach, collect, etc.). Intermediate ops alone won't produce output.
+- **Error: "method not found" for stream operations**
+  - Solution: Ensure Java 8+ is being used (`java -version`)
+
+---
+
+## 📊 Expected Outcome
+
+When you run `StreamsAPI.java`, you should see output organized by operation category:
+
+```
+=== STREAMS API DEMO ===
+
+--- Creating Streams ---
+[Various ways to create streams from collections and arrays]
+
+--- Intermediate Operations ---
+[Output from filter, map, distinct, sorted operations]
+
+--- Terminal Operations ---
+[Output from collect, forEach, reduce, count operations]
+
+--- Stream Pipeline Examples ---
+[Complex pipelines combining multiple operations]
+
+--- Special Stream Types ---
+[IntStream, LongStream, DoubleStream examples]
+```
+
+Key characteristics:
+- Clear section headers
+- Demonstrates lazy evaluation
+- Shows both sequential and potential parallel processing
+- No errors or exceptions
+
+---
+
+## 📚 Hands-on Lab
+
+### Exercise 1: Guided — Create Your First Stream Pipeline [Beginner]
+
+**Task:** Filter and transform a list of numbers using streams.
+
+**Given:**
+```java
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+// Task: Keep only even numbers and double them
+List<Integer> result = numbers.stream()
+    .filter(n -> n % 2 == 0)      // Keep evens
+    .map(n -> n * 2)              // Double each
+    .collect(Collectors.toList());
+
+System.out.println(result);
+// Expected: [4, 8, 12, 16, 20]
+```
+
+**Your Task:** Write the code to filter numbers greater than 5 and convert to uppercase string representation:
+```java
+List<String> strings = Arrays.asList("apple", "kiwi", "banana", "grape", "fig");
+// Filter to length > 4 and uppercase
+List<String> result = strings.stream()
+    .filter(???)     // When length > 4
+    .map(???)        // Convert to uppercase
+    .collect(Collectors.toList());
+// Expected: [APPLE, BANANA, GRAPE]
+```
+
+**Hint:** `s.length() > 4` and `String::toUpperCase`
+
+---
+
+### Exercise 2: Semi-Guided — Reduce and Collect Operations [Intermediate]
+
+**Task:** Group and count elements in a stream.
+
+**Given:**
+```java
+List<String> words = Arrays.asList("cat", "dog", "cat", "bird", "dog", "dog");
+
+// Count occurrences of each word
+Map<String, Long> counts = words.stream()
+    .collect(Collectors.groupingBy(
+        Function.identity(),      // Group by the word itself
+        Collectors.counting()     // Count in each group
+    ));
+
+System.out.println(counts);
+// Expected: {cat=2, dog=3, bird=1}
+```
+
+**Your Task:** Find the sum of all numbers in a list using reduce():
+```java
+List<Integer> nums = Arrays.asList(1, 2, 3, 4, 5);
+
+int sum = nums.stream()
+    .reduce(0, (a, b) -> a + b);  // What does this do?
+
+System.out.println(sum);
+// Expected: 15
+```
+
+**Hint:** `reduce(initialValue, combiner)`
+
+---
+
+### Exercise 3: Challenge — Complex Pipeline with Intermediate Operations [Advanced]
+
+**Task:** Build a complex stream pipeline with multiple transformations.
+
+**Challenge Code:**
+```java
+List<Person> people = getPeople(); // List of Person objects with name and age
+
+// Find people over 18, sort by name, collect first 5 names
+List<String> result = people.stream()
+    .filter(p -> p.getAge() > 18)  // Keep adults
+    .sorted(Comparator.comparing(Person::getName))  // Sort by name
+    .limit(5)  // Keep first 5
+    .map(Person::getName)  // Extract names
+    .collect(Collectors.toList());
+```
+
+**Your Challenge:** Build a pipeline that:
+1. Filters numbers >= 5
+2. Removes duplicates
+3. Multiplies each by 2
+4. Stops after 3 elements
+5. Collects to list
+
+```java
+List<Integer> data = Arrays.asList(3, 5, 5, 7, 7, 7, 2, 8);
+
+List<Integer> result = data.stream()
+    .filter(???)      // >= 5
+    .distinct()       // Remove duplicates
+    .map(n -> n * 2)  // Double
+    .limit(???)       // First N elements
+    .collect(Collectors.toList());
+// Expected: [10, 14, 14] or similar pattern
+```
+
+---
+
+## 🎨 Architecture Diagram
+
+**Stream Pipeline Processing:**
+
+```mermaid
+graph LR
+    A["Source:<br/>Collection/Array"] --> B["Intermediate Ops<br/>(Lazy)"]
+    B --> C["filter"|"map"|"sorted"]
+    C --> D["More Intermediate<br/>(Optional)"]
+    D --> E["Terminal Op<br/>(Triggers Execution)"]
+    E --> F["Result"]
+    
+    style A fill:#c8e6c9
+    style B fill:#fff9c4
+    style C fill:#fff9c4
+    style D fill:#fff9c4
+    style E fill:#ffccbc
+    style F fill:#b3e5fc
+```
+
+**Stream Operation Categories:**
+
+```mermaid
+graph TD
+    A["Stream Operations"] --> B["Intermediate<br/>(Return Stream)"]
+    A --> C["Terminal<br/>(Return Result)"]
+    
+    B --> B1["Stateless:<br/>filter, map"]
+    B --> B2["Stateful:<br/>sorted, distinct"]
+    
+    C --> C1["Non-Consuming:<br/>forEach, peek"]
+    C --> C2["Reducing:<br/>reduce, collect"]
+    C --> C3["Searching:<br/>findFirst, findAny"]
+    C --> C4["Matching:<br/>anyMatch, allMatch"]
+    
+    style B fill:#bbdefb
+    style C fill:#ffe0b2
+    style B1 fill:#c8e6c9
+    style B2 fill:#ffccbc
+```
 
 ---
 
@@ -189,14 +462,11 @@ A stream pipeline consists of three parts:
 List<String> list = Arrays.asList("a", "b", "c");
 Stream<String> streamFromList = list.stream();
 
-// Set
 Set<Integer> set = new HashSet<>(Arrays.asList(1, 2, 3));
 Stream<Integer> streamFromSet = set.stream();
+## 📋 Prerequisites & Next Topics
 
 // Map (entries, keys, values)
-Map<String, Integer> map = new HashMap<>();
-Stream<Map.Entry<String, Integer>> entries = map.entrySet().stream();
-Stream<String> keys = map.keySet().stream();
 Stream<Integer> values = map.values().stream();
 ```
 
@@ -204,7 +474,6 @@ Stream<Integer> values = map.values().stream();
 
 ```java
 // Using Arrays.stream()
-String[] array = {"a", "b", "c"};
 Stream<String> streamFromArray = Arrays.stream(array);
 
 // Primitive arrays

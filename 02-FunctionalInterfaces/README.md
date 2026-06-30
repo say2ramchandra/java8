@@ -1,6 +1,12 @@
 # Functional Interfaces - Comprehensive Guide
 
 ## 📚 Table of Contents
+- [Learning Objectives](#learning-objectives)
+- [Theory Checkpoints](#theory-checkpoints)
+- [Run Steps](#run-steps)
+- [Verification Steps](#verification-steps)
+- [Expected Outcome](#expected-outcome)
+- [Hands-on Lab](#hands-on-lab)
 - [Introduction](#introduction)
 - [What is a Functional Interface?](#what-is-a-functional-interface)
 - [The @FunctionalInterface Annotation](#the-functionalinterface-annotation)
@@ -10,6 +16,267 @@
 - [Custom Functional Interfaces](#custom-functional-interfaces)
 - [Advanced Patterns](#advanced-patterns)
 - [Quick Reference Card](#quick-reference-card)
+
+---
+## 🎯 Learning Objectives
+
+## 📋 Prerequisites & Next Topics
+After completing this module, you will:
+
+- [ ] Learn to use the `@FunctionalInterface` annotation correctly
+- [ ] Master the 4 core built-in functional interfaces: Predicate, Function, Consumer, Supplier
+- [ ] Understand bi-variants (BiPredicate, BiFunction, BiConsumer, BinaryOperator)
+- [ ] Create custom functional interfaces for domain-specific logic
+- [ ] Chain and compose functional interface methods effectively
+- [ ] Recognize when to use each functional interface type
+---
+
+## ✅ Theory Checkpoints
+
+**Q1: What makes an interface"functional"?**
+
+A: A functional interface has exactly ONE abstract method (Single Abstract Method - SAM). It can have multiple default and static methods, but only one abstract method. This single abstract method is the contract that lambda expressions implement.
+
+**Q2: What does `@FunctionalInterface` annotation do?**
+
+A: It's a marker annotation that tells the compiler to verify that the interface has exactly one abstract method. If you violate this contract, the compiler will throw an error. It's optional but recommended as it documents intent.
+
+**Q3: Why do we need different functional interfaces like Predicate, Function, and Consumer?**
+
+A: They represent different patterns: Predicate tests a condition (returns boolean), Function transforms input to output, Consumer performs an action with no return, and Supplier provides a value with no input. Using the right one makes code more readable and self-documenting.
+
+**Q4: What's the difference between `Function<T, R>` and `UnaryOperator<T>`?**
+
+A: `Function<T, R>` transforms a T to an R (different types allowed). `UnaryOperator<T>` is a Function where input and output types are the same (T to T). UnaryOperator is more specific and semantically clearer when the types must match.
+
+**Q5: How does method chaining work with functional interfaces?**
+
+A: Many functional interfaces provide default methods (like `andThen()`, `compose()`, `and()`, `or()`) that allow you to combine multiple lambdas into a pipeline. This enables functional composition for cleaner, more readable code.
+
+---
+
+## 🚀 Run Steps
+
+### Compile and Run the Demo
+
+**Step 1:** Navigate to the module directory
+```bash
+cd 02-FunctionalInterfaces
+```
+
+**Step 2:** Compile the Java file
+```bash
+javac FunctionalInterfaces.java
+```
+
+**Step 3:** Run the demo
+```bash
+java FunctionalInterfaces
+```
+
+### Alternative: Using IDE
+
+If using an IDE (IntelliJ, Eclipse, VS Code):
+1. Open `FunctionalInterfaces.java`
+2. Click the "Run" button (or press `Shift+F10` in IntelliJ)
+3. Output appears in the console
+
+---
+
+## ✔️ Verification Steps
+
+**Expected behavior after running:**
+1. The program should execute without compilation errors
+2. Console output should display functional interface usage examples
+3. All 4 core interfaces should show usage: Predicate, Function, Consumer, Supplier
+4. Bi-variant examples should demonstrate multi-parameter variants
+5. No exceptions should be thrown
+
+**Troubleshooting:**
+- **Error: "cannot find symbol" or "class not found"**
+  - Solution: Ensure you're in the `02-FunctionalInterfaces` directory before compiling
+- **Error: "interface does not override abstract method"**
+  - Solution: Check that your custom functional interface has exactly one abstract method
+- **No output appears**
+  - Solution: Check that your Java version is 8 or higher (`java -version`)
+
+---
+
+## 📊 Expected Outcome
+
+When you run `FunctionalInterfaces.java`, you should see output similar to:
+
+```
+=== FUNCTIONAL INTERFACES DEMO ===
+
+--- Predicate Examples ---
+[Output testing conditions on data]
+
+--- Function Examples ---
+[Output showing data transformations]
+
+--- Consumer Examples ---
+[Output showing side effects]
+
+--- Supplier Examples ---
+[Output demonstrating value generation]
+
+--- Bi-variant Examples ---
+[Output showing multi-parameter operations]
+
+--- Method Composition ---
+[Output showing chained operations]
+```
+
+The program should demonstrate:
+- Basic usage of each core functional interface
+- Bi-variant operations
+- Method chaining and composition
+- Real-world use cases (filtering, mapping, processing)
+
+---
+
+## 📚 Hands-on Lab
+
+### Exercise 1: Guided — Create a Custom Functional Interface [Beginner]
+
+**Task:** Create a functional interface that converts a number to text.
+
+**Steps:**
+1. Create an interface named `NumberToText` with one abstract method: `String convert(int num)`
+2. Add the `@FunctionalInterface` annotation
+3. Implement it with a lambda that converts numbers to words (e.g., 1 -> "One", 2 -> "Two")
+
+**Template:**
+```java
+@FunctionalInterface
+interface NumberToText {
+    String convert(int num);
+}
+
+// Usage
+NumberToText converter = num -> {
+    switch(num) {
+        case 1: return "One";
+        case 2: return "Two";
+        default: return "Unknown";
+    }
+};
+
+System.out.println(converter.convert(1)); // Expected: One
+```
+
+**Hint:** Remember: exactly ONE abstract method. Default and static methods are optional.
+
+---
+
+### Exercise 2: Semi-Guided — Compose Predicates with `and()` [Intermediate]
+
+**Task:** Create two predicates and combine them to filter a list.
+
+**Given:**
+```java
+List<Integer> numbers = Arrays.asList(2, 4, 5, 7, 8, 10, 15, 20);
+
+Predicate<Integer> isEven = n -> n % 2 == 0;
+Predicate<Integer> isGreaterThanFive = n -> n > 5;
+
+// Combine them
+Predicate<Integer> combined = isEven.and(???);
+
+List<Integer> result = numbers.stream()
+    .filter(combined)
+    .collect(Collectors.toList());
+
+System.out.println(result); // Expected: [8, 10, 20]
+```
+
+**Hint:** The `and()` method chains predicates with AND logic. Both must be true.
+
+**Solution:**
+```java
+Predicate<Integer> combined = isEven.and(isGreaterThanFive);
+```
+
+---
+
+### Exercise 3: Challenge — Custom Comparator with Function Composition [Advanced]
+
+**Task:** Use Function composition to build a complex transformation pipeline.
+
+**Challenge Code:**
+```java
+Function<String, String> trim = String::trim;
+Function<String, String> uppercase = String::toUpperCase;
+Function<String, Integer> length = String::length;
+
+// Compose trim and uppercase
+Function<String, String> trimAndUpper = trim.???(uppercase);
+
+// Use it
+String result = trimAndUpper.apply("  hello world  ");
+System.out.println(result);
+// Expected: "HELLO WORLD"
+
+// Hint: andThen() vs compose()
+// - andThen: this function THEN the next
+// - compose: first the argument function, THEN this function
+```
+
+**Solution:**
+```java
+Function<String, String> trimAndUpper = trim.andThen(uppercase);
+// Or equivalently:
+Function<String, String> trimAndUpper = uppercase.compose(trim);
+```
+
+---
+
+## 🎨 Architecture Diagram
+
+**Functional Interface Hierarchy:**
+
+```mermaid
+graph TD
+    A["Functional Interface<br/>Exactly ONE abstract method"] --> B["Core 4"]
+    A --> C["Bi-Variants"]
+    A --> D["Operators"]
+    A --> E["Primitive Specs"]
+    
+    B --> B1["Predicate<T><br/>T -> boolean"]
+    B --> B2["Function<T,R><br/>T -> R"]
+    B --> B3["Consumer<T><br/>T -> void"]
+    B --> B4["Supplier<T><br/>() -> T"]
+    
+    C --> C1["BiPredicate<T,U><br/>(T,U) -> boolean"]
+    C --> C2["BiFunction<T,U,R><br/>(T,U) -> R"]
+    C --> C3["BiConsumer<T,U><br/>(T,U) -> void"]
+    
+    D --> D1["UnaryOperator<T><br/>T -> T"]
+    D --> D2["BinaryOperator<T><br/>(T,T) -> T"]
+    
+    E --> E1["IntPredicate, LongPredicate...<br/>Avoid boxing overhead"]
+    
+    style A fill:#c8e6c9
+    style B fill:#bbdefb
+    style C fill:#ffe0b2
+    style D fill:#f8bbd0
+```
+
+**Method Composition Pattern:**
+
+```mermaid
+graph LR
+    A["Function 1<br/>trim()"] --> B["andThen"] --> C["Function 2<br/>uppercase()"]
+    D["Input:<br/>'  hello  '"] --> A
+    A --> E["After trim:<br/>'hello'"]
+    E --> B
+    C --> F["Final:<br/>'HELLO'"]
+    
+    style D fill:#ffe0b2
+    style E fill:#bbdefb
+    style F fill:#c8e6c9
+```
 
 ---
 

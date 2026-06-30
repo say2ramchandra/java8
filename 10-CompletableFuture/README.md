@@ -1,12 +1,235 @@
 # CompletableFuture - Comprehensive Guide
 
 ## 📚 Table of Contents
+- [Learning Objectives](#learning-objectives)
+- [Theory Checkpoints](#theory-checkpoints)
+- [Run Steps](#run-steps)
+- [Verification Steps](#verification-steps)
+- [Expected Outcome](#expected-outcome)
+- [Hands-on Lab](#hands-on-lab)
 - [Introduction](#introduction)
 - [Creating CompletableFuture](#creating-completablefuture)
 - [Transformation Methods](#transformation-methods)
 - [Combining Futures](#combining-futures)
 - [Error Handling](#error-handling)
 - [Quick Reference Card](#quick-reference-card)
+
+
+## 🎯 Learning Objectives
+
+After completing this module, you will:
+## 📋 Prerequisites & Next Topics
+
+### Prerequisites
+- **[Module 01 - Lambda Expressions](../01-LambdaExpressions/README.md)** — Lambdas used in callbacks
+- Optional: **[Module 04 - Streams API](../04-StreamsAPI/README.md)** — For combined patterns
+
+### Next Topics
+After mastering CompletableFuture, proceed to:
+1. **[Module 11 - Functional Interfaces Deep Dive](../11-FunctionalInterfacesDeepDive/README.md)** — Advanced functional patterns
+2. **[Module 13 - Java 8 Revision](../13-Java8Revision/README.md)** — Capstone: integrate all concepts
+
+---
+
+## 🎯 Learning Objectives
+
+After completing this module, you will:
+
+- [ ] Understand CompletableFuture vs blocking Future (Java 5)
+- [ ] Master async execution: supplyAsync(), runAsync() with custom executors
+- [ ] Learn transformation: thenApply(), thenAccept(), thenRun()
+- [ ] Combine futures: thenCombine(), allOf(), anyOf()
+- [ ] Handle exceptions: exceptionally(), handle(), whenComplete()
+- [ ] Understand composition: thenCompose() for chained async operations
+- [ ] Write non-blocking asynchronous code
+
+---
+
+## ✅ Theory Checkpoints
+
+**Q1: Why is CompletableFuture better than Future for async programming?**
+
+A: Future blocks on get(). CompletableFuture uses callbacks (thenApply, thenAccept) so threads aren't blocked waiting. You can chain operations declaratively.
+
+**Q2: What's the difference between thenApply, thenAccept, and thenRun?**
+
+A: thenApply transforms (R apply(T)). thenAccept consumes without return (void accept(T)). thenRun executes with no input (void run()).
+
+**Q3: When would you use thenCompose vs thenApply?**
+
+A: thenApply for sync transformations (T -> R). thenCompose for async operations that return CompletableFuture (T -> CompletableFuture<R>). thenCompose flattens nested futures.
+
+**Q4: How does exceptionally() handle errors?**
+
+A: If the future completes exceptionally, exceptionally() provides a recovery value. If it succeeds, passes through. Like try-catch for async code.
+
+**Q5: What's the gotcha with executor threads in CompletableFuture?**
+
+A: If you don't specify an executor, it uses ForkJoinPool.commonPool(). This might be shared with streams. For I/O, provide a dedicated thread pool executor.
+
+---
+
+## 🚀 Run Steps
+
+### Compile and Run the Demo
+
+**Step 1:** Navigate to the module directory
+```bash
+cd 10-CompletableFuture
+```
+
+**Step 2:** Compile the Java file
+```bash
+javac CompletableFutureDemo.java
+```
+
+**Step 3:** Run the demo
+```bash
+java CompletableFutureDemo
+```
+
+### Alternative: Using IDE
+
+If using an IDE:
+1. Open `CompletableFutureDemo.java`
+2. Click "Run"
+3. Output in console
+
+---
+
+## ✅ Verification Steps
+
+**Expected behavior:**
+1. Compiles without errors
+2. Shows async execution happening
+3. Chaining operations produces correct results
+4. Error handling works (exceptional cases complete)
+5. No thread blocking (should finish quickly even with waits)
+
+**Troubleshooting:**
+- **Error: "Thread.sleep() exception"**
+  - Solution: Use try-catch or wrap in async method
+- **Futures blocked/hanging**
+  - Solution: Ensure terminal operation calls get() or similar
+- **Unexpected execution order**
+  - Solution: Remember chaining is declarative; trace execution flow
+
+---
+
+## 📊 Expected Outcome
+
+```
+=== COMPLETABLEFUTURE DEMO ===
+
+--- Creating Async Tasks ---
+[supplyAsync, runAsync output]
+
+--- Chaining Operations ---
+[thenApply, thenAccept results]
+
+--- Combining Futures ---
+[thenCombine, allOf output]
+
+--- Error Handling ---
+[exceptionally, handle behavior]
+
+--- Composition ---
+[thenCompose nested async]
+
+--- Real-World Patterns ---
+[Async workflow examples]
+```
+
+---
+
+## 📚 Hands-on Lab
+
+### Exercise 1: Guided — Create Async Task [Beginner]
+
+```java
+// Run async task
+CompletableFuture<String> future = CompletableFuture
+    .supplyAsync(() -> {
+        Thread.sleep(1000);
+        return "Hello from async";
+    });
+
+// Chain transformation
+CompletableFuture<String> result = future
+    .thenApply(s -> s.toUpperCase());
+
+System.out.println(result.get());  // HELLO FROM ASYNC
+```
+
+**Your Task:** Create async task that doubles a number:
+```java
+CompletableFuture<Integer> future = CompletableFuture
+    .supplyAsync(() -> 5)
+    .thenApply(n -> n * 2);
+
+System.out.println(future.get());  // Expected: 10
+```
+
+---
+
+### Exercise 2: Semi-Guided — Combine Futures [Intermediate]
+
+```java
+CompletableFuture<Integer> f1 = CompletableFuture.supplyAsync(() -> 5);
+CompletableFuture<Integer> f2 = CompletableFuture.supplyAsync(() -> 3);
+
+// Combine results
+CompletableFuture<Integer> combined = f1.thenCombine(f2, (a, b) -> a + b);
+
+System.out.println(combined.get());  // 8
+```
+
+**Your Task:** Combine three futures:
+```java
+CompletableFuture<String> f1 = CompletableFuture.supplyAsync(() -> "Hello");
+CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> " ");
+CompletableFuture<String> f3 = CompletableFuture.supplyAsync(() -> "World");
+
+// Combine all three
+```
+
+---
+
+### Exercise 3: Challenge — Error Handling [Advanced]
+
+```java
+CompletableFuture<Integer> future = CompletableFuture
+    .supplyAsync(() -> { throw new RuntimeException("Error!"); })
+    .exceptionally(ex -> 0);  // Default value on error
+
+System.out.println(future.get());  // 0
+```
+
+**Your Challenge:** Handle multiple async operations with error recovery.
+
+---
+
+## 🎨 Architecture Diagram
+
+**CompletableFuture Chain:**
+
+```mermaid
+graph LR
+    A["Async Task"] --> B["supplyAsync"]
+    B --> C["thenApply<br/>Transform"]
+    C --> D["thenAccept<br/>Consume"]
+    D --> E{"Error?"}
+    E -->|Exception| F["exceptionally"]
+    E -->|Success| G["Complete
+            "]
+    F --> G
+    
+    style A fill:#c8e6c9
+    style B fill:#fff9c4
+    style C fill:#bbdefb
+    style D fill:#f8bbd0
+    style G fill:#b3e5fc
+```
 
 ---
 

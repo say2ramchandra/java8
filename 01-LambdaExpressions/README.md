@@ -1,6 +1,12 @@
 # Lambda Expressions - Comprehensive Guide
 
 ## 📚 Table of Contents
+- [Learning Objectives](#learning-objectives)
+- [Theory Checkpoints](#theory-checkpoints)
+- [Run Steps](#run-steps)
+- [Verification Steps](#verification-steps)
+- [Expected Outcome](#expected-outcome)
+- [Hands-on Lab](#hands-on-lab)
 - [Introduction](#introduction)
 - [What are Lambda Expressions?](#what-are-lambda-expressions)
 - [Syntax Deep Dive](#syntax-deep-dive)
@@ -10,6 +16,236 @@
 - [Best Practices](#best-practices)
 - [Common Pitfalls](#common-pitfalls)
 - [Quick Reference Card](#quick-reference-card)
+
+---
+## 🎯 Learning Objectives
+
+## 📋 Prerequisites & Next Topics
+After completing this module, you will:
+
+- [ ] Understand what lambda expressions are and why they matter in Java 8
+- [ ] Master lambda syntax variations (no params, single param, multiple params, block body)
+- [ ] Learn how lambdas work internally (invokedynamic bytecode instruction)
+- [ ] Apply lambdas effectively in real-world scenarios (filtering, mapping, iteration)
+- [ ] Recognize when to use lambdas vs anonymous classes vs method references
+- [ ] Avoid common lambda pitfalls (variable capture, checked exceptions, null safety)
+- [ ] Write concise, readable, and maintainable functional code
+
+
+## ✅ Theory Checkpoints
+
+**Q1: What is the core purpose of lambda expressions?**
+
+A: Lambda expressions enable functional programming in Java by providing concise, anonymous functions that can be passed as arguments or stored in variables. They implement functional interfaces by providing a shorter syntax than anonymous classes.
+
+**Q2: What is an "effectively final" variable and why does it matter?**
+
+A: An effectively final variable is one that is never modified after initialization. Lambdas must capture only effectively final variables because lambdas are stateless and don't have their own scope. This prevents unexpected behavior if variables were modified.
+
+**Q3: How is a lambda expression different from an anonymous class under the hood?**
+
+A: While conceptually similar, lambdas use the `invokedynamic` bytecode instruction, which is more efficient than anonymous classes. Lambdas don't create separate .class files and don't introduce new scopes (unlike anonymous classes).
+
+**Q4: What's the gotcha with `this` reference in lambdas vs anonymous classes?**
+
+A: In a lambda, `this` refers to the enclosing class, not the lambda itself (which has no scope). In an anonymous class, `this` refers to the anonymous class instance. This is a common source of confusion.
+
+**Q5: When should you use a lambda vs a method reference?**
+
+A: Use method references when you're simply delegating to an existing method (e.g., `System.out::println` instead of `s -> System.out.println(s)`). Use lambdas when you need to add logic or transformation.
+
+---
+
+## 🚀 Run Steps
+
+### Compile and Run the Demo
+
+**Step 1:** Navigate to the module directory
+```bash
+cd 01-LambdaExpressions
+```
+
+**Step 2:** Compile the Java file
+```bash
+javac LambdaExpressions.java
+```
+
+**Step 3:** Run the demo
+```bash
+java LambdaExpressions
+```
+
+### Alternative: Using IDE
+
+If using an IDE (IntelliJ, Eclipse, VS Code):
+1. Open `LambdaExpressions.java`
+2. Click the "Run" button (or press `Shift+F10` in IntelliJ)
+3. Output appears in the console
+
+---
+
+## ✔️ Verification Steps
+
+**Expected behavior after running:**
+1. The program should execute without compilation errors
+2. Console output should display lambda expression examples
+3. All 5 demo sections should produce output (lambdas with 0, 1, 2+ params, etc.)
+4. No exceptions should be thrown
+
+**Troubleshooting:**
+- **Error: "class LambdaExpressions is public, should be declared in a file named LambdaExpressions.java"**
+  - Solution: Ensure file name matches class name exactly
+- **Error: "cannot find symbol" or "class not found"**
+  - Solution: Ensure you're in the `01-LambdaExpressions` directory before compiling
+- **No output appears**
+  - Solution: Check that your Java version is 8 or higher (`java -version`)
+
+---
+
+## 📊 Expected Outcome
+
+When you run `LambdaExpressions.java`, you should see output similar to:
+
+```
+=== LAMBDA EXPRESSIONS DEMO ===
+
+--- Lambda with No Parameters ---
+[Output from Runnable and Supplier demos]
+
+--- Lambda with Single Parameter ---
+[Output from Predicate and Function demos]
+
+--- Lambda with Multiple Parameters ---
+[Output from BiFunction and BinaryOperator demos]
+
+--- Sorting with Lambda ---
+[Sorted list output]
+
+--- Stream with Lambda and map() ---
+[Transformed stream output]
+```
+
+The specific output values depend on the data used in the demo, but the program should demonstrate:
+- Basic lambda syntax
+- Parameter variations
+- Functional interface usage
+- Integration with Collections and Streams
+
+---
+
+## 📚 Hands-on Lab
+
+### Exercise 1: Guided — Write Your First Lambda [Beginner]
+
+**Task:** Create a simple lambda that doubles numbers.
+
+**Steps:**
+1. Create a `Function<Integer, Integer>` lambda called `doubler`
+2. The lambda should take an integer as input and return it multiplied by 2
+3. Test it with: `System.out.println(doubler.apply(5)); // Should print: 10`
+
+**Template:**
+```java
+Function<Integer, Integer> doubler = x -> x * 2;
+// Test it
+System.out.println(doubler.apply(5)); // Expected: 10
+```
+
+**Hint:** The syntax is: `Function<InputType, OutputType> name = input -> expression;`
+
+---
+
+### Exercise 2: Semi-Guided — Filter List with Predicate [Intermediate]
+
+**Task:** Write a lambda that filters a list to keep only numbers greater than 5.
+
+**Given:**
+```java
+List<Integer> numbers = Arrays.asList(3, 7, 2, 8, 1, 9, 4);
+Predicate<Integer> isGreater = ???;
+
+// Use it to filter
+List<Integer> filtered = numbers.stream()
+    .filter(isGreater)
+    .collect(Collectors.toList());
+
+System.out.println(filtered); // Expected: [7, 8, 9]
+```
+
+**Hint:** A Predicate returns a `boolean`. The signature is: `Predicate<T>` which means `T -> boolean`
+
+**Your solution:**
+```java
+Predicate<Integer> isGreater = n -> n > 5;
+```
+
+---
+
+### Exercise 3: Challenge — Custom Sorting with Lambda [Advanced]
+
+**Task:** Sort a list of strings by length (shortest first), then alphabetically for same-length strings.
+
+**Challenge Code:**
+```java
+List<String> words = Arrays.asList("apple", "cat", "dog", "banana", "bat");
+
+// Write a custom Comparator lambda that sorts by length, then alphabetically
+words.sort(???);
+
+System.out.println(words);
+// Expected output: [cat, dog, bat, apple, banana]
+// (or [bat, cat, dog, apple, banana] for pure alphabetical within same length)
+```
+
+**Hint:** `Comparator<String>` requires a lambda: `(s1, s2) -> expression`
+Return negative if s1 < s2, positive if s1 > s2, zero if equal.
+
+**Solution:**
+```java
+words.sort((s1, s2) -> {
+    int lengthCompare = Integer.compare(s1.length(), s2.length());
+    return lengthCompare != 0 ? lengthCompare : s1.compareTo(s2);
+});
+```
+
+---
+
+## 🎨 Architecture Diagram
+
+**Lambda Expression Flow:**
+
+```mermaid
+graph LR
+    A["Lambda Expression<br/>(x, y) -> x + y"] --> B["Compiler<br/>Generates invokedynamic"]
+    B --> C["Functional Interface<br/>inferred from context"]
+    C --> D["Runtime Binding<br/>Bootstrap Method"]
+    D --> E["Executable<br/>Closed-over expression"]
+    
+    style A fill:#e1f5ff
+    style B fill:#fff3e0
+    style C fill:#f3e5f5
+    style D fill:#e8f5e9
+    style E fill:#fce4ec
+```
+
+**Lambda Internals:**
+
+```mermaid
+graph TD
+    A["Lambda Expression:
+    (a, b) -> a + b"] --> B{"Target Type
+    Inferred?"}
+    B -->|Yes| C["Map to Functional<br/>Interface Method"]
+    B -->|No| D["Compile Error"]
+    C --> E["Generate invokedynamic<br/>instruction"]
+    E --> F["Runtime: Call Bootstrap<br/>Method"]
+    F --> G["Create CallSite<br/>with implementation"]
+    G --> H["Execute lambda/n(calls specific method)"]
+    
+    style A fill:#c8e6c9
+    style E fill:#ffccbc
+    style H fill:#b3e5fc
+```
 
 ---
 

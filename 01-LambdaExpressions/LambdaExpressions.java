@@ -106,6 +106,8 @@ public class LambdaExpressions {
         System.out.println("No params: " + greeting.get());
         
         // Type 2: Single parameter with type inference
+            // Why: The compiler infers 'str' is String from Function<String, Integer> generic type.
+            // This reduces boilerplate while maintaining type safety.
         Function<String, Integer> length = str -> str.length();
         System.out.println("Single param: Length of 'Java' = " + length.apply("Java"));
         
@@ -114,11 +116,15 @@ public class LambdaExpressions {
         System.out.println("Explicit type: " + uppercase.apply("lambda"));
         
         // Type 4: Multiple parameters
+            // Why: BiPredicate<String, Integer> tells compiler both parameter types.
+            // Functional interfaces define the lambda's contract: what types in, what type out.
         BiPredicate<String, Integer> checkLength = (str, len) -> str.length() > len;
         System.out.println("Multiple params: Is 'Lambda' longer than 5? " + 
                           checkLength.test("Lambda", 5));
         
         // Type 5: Lambda with complex body
+            // Why: When lambda needs multiple statements, use braces {} and explicit return.
+            // This is why lambdas work well with streams—they express computation intent concisely.
         BinaryOperator<Integer> complexOperation = (x, y) -> {
             int sum = x + y;
             int product = x * y;
@@ -141,6 +147,8 @@ public class LambdaExpressions {
         
         // Traditional forEach with anonymous class
         System.out.println("Traditional approach:");
+            // Why: Anonymous inner classes require boilerplate. Lambdas replace this pattern,
+            // making code readable and enabling functional programming style.
         languages.forEach(new Consumer<String>() {
             @Override
             public void accept(String lang) {
@@ -153,6 +161,8 @@ public class LambdaExpressions {
         languages.forEach(lang -> System.out.println("  - " + lang));
         
         // Sorting with lambda
+            // Why: Comparator (functional interface with (T,T)->int) benefits from lambdas.
+            // Collections API now accepts lambda behavior—this is retrofitting Java with functional style.
         List<String> sortedLanguages = new ArrayList<>(languages);
         sortedLanguages.sort((a, b) -> a.compareTo(b));
         System.out.println("\nSorted: " + sortedLanguages);
@@ -184,6 +194,8 @@ public class LambdaExpressions {
         );
         
         // Filter employees by department using lambda
+            // Why: Stream API + lambdas = declarative filtering. We say WHAT (filter condition)
+            // not HOW (loop, index, null checks). The lambda is Predicate<Employee>.
         System.out.println("\nEngineering Department:");
         employees.stream()
                 .filter(emp -> emp.department.equals("Engineering"))
@@ -197,11 +209,15 @@ public class LambdaExpressions {
         
         // Complex filtering with multiple conditions
         System.out.println("\nSenior Engineering staff (age > 30, dept = Engineering):");
+            // Why: Lambdas allow composition of conditions without intermediate variables.
+            // This is the power of functional composition—combine predicates elegantly.
         employees.stream()
                 .filter(emp -> emp.age > 30 && emp.department.equals("Engineering"))
                 .forEach(emp -> System.out.println("  " + emp));
         
         // Calculate average salary using lambda
+            // Why: mapToDouble(emp -> emp.salary) transforms each Employee to double.
+            // Lambdas bridge object domain (Employee) and numeric domain (salary calculation).
         double avgSalary = employees.stream()
                 .mapToDouble(emp -> emp.salary)
                 .average()
@@ -223,6 +239,8 @@ public class LambdaExpressions {
         EventProcessor processor = new EventProcessor();
         
         // Register event handlers using lambdas
+            // Why: Passing lambdas as handlers is "behavior injection"—the processor doesn't know
+            // what will happen on login (log, email, analytics). Lambdas make this pattern elegant.
         processor.onUserLogin(user -> {
             System.out.println("  [LOGIN] User '" + user + "' logged in at " + new Date());
             System.out.println("  [SECURITY] Logging IP address and session details...");
@@ -266,6 +284,8 @@ public class LambdaExpressions {
         );
         
         // Transformation 1: Apply discount to pending orders over $100
+            // Why: This chain (filter→forEach) is declarative: "filter THEN act".
+            // Lambda captures the transformation logic inline—readable pipeline of intent.
         System.out.println("\nApplying 10% discount to pending orders over $100:");
         orders.stream()
                 .filter(order -> order.status.equals("PENDING") && order.amount > 100)
@@ -279,6 +299,8 @@ public class LambdaExpressions {
         
         // Transformation 2: Generate shipping labels
         System.out.println("\nGenerating shipping labels for pending orders:");
+            // Why: map() transforms Order objects to Strings. Lambda does the transformation.
+            // This separation of filter (selection) from map (transformation) is functional style.
         orders.stream()
                 .filter(order -> order.status.equals("PENDING"))
                 .map(order -> "SHIP TO: " + order.customerName + 
@@ -288,6 +310,8 @@ public class LambdaExpressions {
         
         // Transformation 3: Calculate total revenue by status
         System.out.println("\nRevenue Summary:");
+            // Why: forEach(order -> ...) iterates, and merge() updates map safely.
+            // Lambdas allow logic(accumulation) inline without separate loop class/method.
         Map<String, Double> revenueByStatus = new HashMap<>();
         orders.forEach(order -> {
             revenueByStatus.merge(order.status, order.amount, (old, val) -> old + val);

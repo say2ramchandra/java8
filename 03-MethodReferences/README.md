@@ -1,6 +1,12 @@
 # Method References - Comprehensive Guide
 
 ## 📚 Table of Contents
+- [Learning Objectives](#learning-objectives)
+- [Theory Checkpoints](#theory-checkpoints)
+- [Run Steps](#run-steps)
+- [Verification Steps](#verification-steps)
+- [Expected Outcome](#expected-outcome)
+- [Hands-on Lab](#hands-on-lab)
 - [Introduction](#introduction)
 - [What are Method References?](#what-are-method-references)
 - [The Four Types](#the-four-types)
@@ -11,6 +17,265 @@
 - [When to Use Method References](#when-to-use-method-references)
 - [Common Patterns](#common-patterns)
 - [Quick Reference Card](#quick-reference-card)
+
+---
+## 🎯 Learning Objectives
+
+## 📋 Prerequisites & Next Topics
+After completing this module, you will:
+
+- [ ] Recognize the correct syntax for each type: `ClassName::methodName`
+- [ ] Identify which lambda can be replaced with a method reference
+- [ ] Apply method references in practical scenarios (Stream operations, Collections)
+- [ ] Understand the distinction between types carefully (especially Type 3)
+- [ ] Write cleaner, more readable functional code using method references
+
+
+## ✅ Theory Checkpoints
+
+**Q1: What's the relationship between lambda expressions and method references?**
+
+A: Method references are a special case of lambdas where the lambda simply delegates to an existing method. They provide more concise syntax when you're just calling a method without adding logic. `s -> System.out.println(s)` becomes `System.out::println`.
+
+**Q2: What are the 4 types of method references?**
+
+A: (1) Static: `ClassName::staticMethod`, (2) Instance on particular object: `object::instanceMethod`, (3) Instance on arbitrary object: `ClassName::instanceMethod`, (4) Constructor: `ClassName::new`.
+
+**Q3: Why is Type 3 (instance method on arbitrary object) confusing?**
+
+A: Type 3 looks like a static reference (`ClassName::method`) but uses an instance method. The first parameter becomes the object on which the method is called. Example: `String::length` is equivalent to `s -> s.length()`, where `s` is the first parameter.
+
+**Q4: When should you NOT use a method reference?**
+
+A: When your lambda includes logic beyond just calling a method. For example, if you need to transform the parameter or combine multiple operations, use a lambda instead: `s -> s.toLowerCase().trim()` can't be replaced with a simple method reference.
+
+**Q5: What's the performance benefit of method references over lambdas?**
+
+A: Method references can be recognized at compile time and directly reference an existing method, potentially avoiding the creation of a new function object on each invocation. In practice, JIT compilation makes the performance difference negligible, but method references are clearer about intent.
+
+---
+
+## 🚀 Run Steps
+
+### Compile and Run the Demo
+
+**Step 1:** Navigate to the module directory
+```bash
+cd 03-MethodReferences
+```
+
+**Step 2:** Compile the Java file
+```bash
+javac MethodReferences.java
+```
+
+**Step 3:** Run the demo
+```bash
+java MethodReferences
+```
+
+### Alternative: Using IDE
+
+If using an IDE (IntelliJ, Eclipse, VS Code):
+1. Open `MethodReferences.java`
+2. Click the "Run" button (or press `Shift+F10` in IntelliJ)
+3. Output appears in the console
+
+---
+
+## ✔️ Verification Steps
+
+**Expected behavior after running:**
+1. The program should execute without compilation errors
+2. Console output should demonstrate all 4 types of method references
+3. Output should show equivalence between lambda and method reference versions
+4. All examples should run and produce results without exceptions
+5. No NullPointerExceptions or "method not found" errors
+
+**Troubleshooting:**
+- **Error: "cannot find symbol" or invalid method reference**
+  - Solution: Verify the method exists and is accessible (public)
+- **Error: "incompatible types"**
+  - Solution: Ensure parentheses around method reference: `(T t) -> Class::method` not `T -> Class::method`
+- **No output appears**
+  - Solution: Check that your Java version is 8 or higher (`java -version`)
+
+---
+
+## 📊 Expected Outcome
+
+When you run `MethodReferences.java`, you should see output similar to:
+
+```
+=== METHOD REFERENCES DEMO ===
+
+--- Type 1: Static Method References ---
+[Output from Integer::parseInt and similar examples]
+
+--- Type 2: Instance Method on Particular Object ---
+[Output from specific object method references]
+
+--- Type 3: Instance Method on Arbitrary Object ---
+[Output from String::length and similar examples]
+
+--- Type 4: Constructor References ---
+[Output showing ArrayList::new and other constructors]
+
+--- Real-World Examples ---
+[Output from Stream operations using method references]
+
+--- Comparison: Lambda vs Method Reference ---
+[Side-by-side output showing equivalence]
+```
+
+The program should demonstrate:
+- Clarity of method reference syntax vs lambdas
+- All 4 types in practical use
+- Integration with Streams and Collections
+- Performance characteristics (if benchmarking)
+
+---
+
+## 📚 Hands-on Lab
+
+### Exercise 1: Guided — Replace Lambda with Type 1 Method Reference [Beginner]
+
+**Task:** Convert a lambda to a static method reference.
+
+**Before (Lambda):**
+```java
+List<String> numbers = Arrays.asList("123", "456", "789");
+List<Integer> ints = numbers.stream()
+    .map(s -> Integer.parseInt(s))  // Lambda
+    .collect(Collectors.toList());
+```
+
+**After (Method Reference):**
+```java
+List<String> numbers = Arrays.asList("123", "456", "789");
+List<Integer> ints = numbers.stream()
+    .map(Integer::parseInt)  // Type 1 - Static method reference
+    .collect(Collectors.toList());
+```
+
+**Your Task:** 
+Replace the lambda with the method reference:
+```java
+List<String> strings = Arrays.asList("HELLO", "WORLD");
+List<Integer> lengths = strings.stream()
+    .map(s -> s.length())  // Convert this to method reference
+    .collect(Collectors.toList());
+```
+
+**Hint:** What method on String returns the length? How would you write it as Type 3?
+
+---
+
+### Exercise 2: Semi-Guided — Type 2 vs Type 3 Method References [Intermediate]
+
+**Task:** Identify which type each method reference is.
+
+**Given:**
+```java
+StringBuilder sb = new StringBuilder();
+
+// Type 2: Particular object instance
+Consumer<String> appendToSB = sb::append;  // Uses SPECIFIC StringBuilder
+appendToSB.accept("Hello");  // Appends to OUR sb
+
+// Type 3: Arbitrary object
+Function<String, String> toUpper = String::toUpperCase;  // Uses ANY String
+String result = toUpper.apply("hello");  // = "HELLO"
+
+// YOUR TASK:
+// Identify whether each should be Type 2 or Type 3:
+
+PrintStream out = System.out;  // Specific object
+Consumer<String> printer1 = out::println;  // Type 2 or 3?
+
+Consumer<String> printer2 = System.out::println;  // Type 2 or 3?
+
+Function<LocalDate, String> formatter = ???;  // Type 2 or 3?
+DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+```
+
+**Answers:**
+```java
+// printer1: Type 2 (uses SPECIFIC PrintStream object)
+// printer2: Type 2 (uses SPECIFIC System.out)
+// formatter: Type 2 (uses specific DateTimeFormatter instance)
+```
+
+---
+
+### Exercise 3: Challenge — Constructor References in Stream Pipeline [Advanced]
+
+**Task:** Use constructor references to create objects from data.
+
+**Challenge Code:**
+```java
+List<String> names = Arrays.asList("Alice", "Bob", "Charlie");
+
+// Create Person objects from strings
+// Assume Person class has: Person(String name)
+List<Person> people = names.stream()
+    .map(???)  // Use constructor reference
+    .collect(Collectors.toList());
+
+// Alternative: Using Supplier with constructor reference
+function<String, Person> personFactory = Person::new;
+Person p = personFactory.apply("David");
+```
+
+**Solution:**
+```java
+List<Person> people = names.stream()
+    .map(Person::new)  // Constructor reference (Type 4)
+    .collect(Collectors.toList());
+```
+
+---
+
+## 🎨 Architecture Diagram
+
+**The 4 Types of Method References:**
+
+```mermaid
+graph TD
+    A["Method Reference<br/>ClassName::methodName"] --> B{"Method Type?"}
+    B -->|Static| C["Type 1: Static<br/>ClassName::staticMethod<br/>No object needed"]
+    B -->|Instance<br/>Particular| D["Type 2: Instance-Particular<br/>object::instanceMethod<br/>Captures specific object"]
+    B -->|Instance<br/>Arbitrary| E["Type 3: Instance-Arbitrary<br/>ClassName::instanceMethod<br/>First param is object"]
+    B -->|Constructor| F["Type 4: Constructor<br/>ClassName::new<br/>Creates new instance"]
+    
+    C --> C1["Example:<br/>Integer::parseInt"]
+    D --> D1["Example:<br/>str::length<br/>(specific String str)"]
+    E --> E1["Example:<br/>String::length<br/>(any String)"]
+    F --> F1["Example:<br/>ArrayList::new"]
+    
+    style C fill:#c8e6c9
+    style D fill:#bbdefb
+    style E fill:#ffe0b2
+    style F fill:#f8bbd0
+```
+
+**Lambda to Method Reference Transformation:**
+
+```mermaid
+graph LR
+    A["Lambda Expression<br/>s -> s.length()"] -->|Refactor| B["Method Reference<br/>String::length"]
+    
+    C["Lambda:<br/>(a,b) -> Integer.max(a,b)"] -->|Refactor| D["Method Reference:<br/>Integer::max"]
+    
+    E["Lambda:<br/>() -> new ArrayList()"] -->|Refactor| F["Method Reference:<br/>ArrayList::new"]
+    
+    style A fill:#ffe0b2
+    style B fill:#c8e6c9
+    style C fill:#ffe0b2
+    style D fill:#c8e6c9
+    style E fill:#ffe0b2
+    style F fill:#c8e6c9
+```
 
 ---
 

@@ -236,7 +236,7 @@ public class Solutions {
         String csv = "John,Doe,30,Engineer";
         
         // Step 1: Split by comma
-        Function<String, String[]> splitByCom ma = str -> str.split(",");
+        Function<String, String[]> splitByComma = str -> str.split(",");
         
         // Step 2: Convert to Person
         Function<String[], PersonData> toPerson = parts -> 

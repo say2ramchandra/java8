@@ -1,6 +1,12 @@
 # Default and Static Methods in Interfaces - Comprehensive Guide
 
 ## 📚 Table of Contents
+- [Learning Objectives](#learning-objectives)
+- [Theory Checkpoints](#theory-checkpoints)
+- [Run Steps](#run-steps)
+- [Verification Steps](#verification-steps)
+- [Expected Outcome](#expected-outcome)
+- [Hands-on Lab](#hands-on-lab)
 - [Introduction](#introduction)
 - [Default Methods](#default-methods)
 - [Static Methods in Interfaces](#static-methods-in-interfaces)
@@ -8,6 +14,273 @@
 - [Real-World Use Cases](#real-world-use-cases)
 - [Best Practices](#best-practices)
 - [Quick Reference Card](#quick-reference-card)
+
+---
+## 🎯 Learning Objectives
+
+## 📋 Prerequisites & Next Topics
+After completing this module, you will:
+
+- [ ] Master default method syntax and when to use them
+- [ ] Distinguish between default methods and static methods in interfaces
+- [ ] Understand interface hierarchy and method resolution order
+- [ ] Recognize multiple inheritance diamond problems and how Java solves them
+- [ ] Apply default/static methods effectively in real-world APIs
+
+
+## ✅ Theory Checkpoints
+
+**Q1: Why couldn't interfaces have method implementations before Java 8?**
+
+A: Adding a new method to an interface would force all implementing classes to provide an implementation, breaking existing code. Default methods allow interfaces to provide implementations while remaining backward compatible.
+
+**Q2: What's the difference between a default method and a static method in interfaces?**
+
+A: Default methods are instance methods (called on objects), can access instance data, and can be overridden. Static methods are class-level, cannot be overridden, and are called on the interface itself (e.g., `Interface.staticMethod()`).
+
+**Q3: What happens when two interfaces have default methods with the same signature?**
+
+A: This is the "diamond problem." The implementing class MUST override the method to resolve the ambiguity. The compiler will force you to provide an implementation.
+
+**Q4: Can you call a default method from a static method in the same interface?**
+
+A: No. Static methods can only access static context. Default methods operate on instances. You'd need an instance object to call a default method from static context.
+
+**Q5: When should you use default vs static vs abstract methods in an interface?**
+
+A: Abstract when contract is required. Default for optional behavior with reasonable implementation. Static for utility functions related to the interface (like `List.of()`).
+
+---
+
+## 🚀 Run Steps
+
+### Compile and Run the Demo
+
+**Step 1:** Navigate to the module directory
+```bash
+cd 06-DefaultStaticMethods
+```
+
+**Step 2:** Compile the Java file
+```bash
+javac DefaultAndStaticMethods.java
+```
+
+**Step 3:** Run the demo
+```bash
+java DefaultAndStaticMethods
+```
+
+### Alternative: Using IDE
+
+If using an IDE (IntelliJ, Eclipse, VS Code):
+1. Open `DefaultAndStaticMethods.java`
+2. Click the "Run" button (or press `Shift+F10` in IntelliJ)
+3. Output appears in the console
+
+---
+
+## ✅ Verification Steps
+
+**Expected behavior after running:**
+1. Program compiles without errors
+2. Output demonstrates default method usage
+3. Output shows static method calls
+4. Output demonstrates method overriding
+5. Multiple inheritance (diamond) cases handled properly
+
+**Troubleshooting:**
+- **Error: "The type MyClass must implement the inherited abstract method"**
+  - Solution: You have conflicting default methods. Override in your class.
+- **Error: "static methods cannot override static methods"**
+  - Solution: Static methods hide, not override. This is expected behavior.
+- **No output for some sections**
+  - Solution: Check that your interface methods are being called correctly
+
+---
+
+## 📊 Expected Outcome
+
+When you run `DefaultAndStaticMethods.java`, you should see output like:
+
+```
+=== DEFAULT AND STATIC METHODS DEMO ===
+
+--- Default Method Examples ---
+[Output from basic default methods]
+
+--- Static Method Examples ---
+[Output from interface static methods]
+
+--- Method Overriding ---
+[Output showing overridden default methods]
+
+--- Multiple Inheritance ---
+[Output showing diamond problem resolution]
+
+--- Real-World Use Cases ---
+[Output from common default/static method patterns]
+```
+
+Key characteristics:
+- Clear method resolution
+- Proper inheritance behavior
+- No compilation errors
+- Default and static methods work as expected
+
+---
+
+## 📚 Hands-on Lab
+
+### Exercise 1: Guided — Add Default Method to Existing Interface [Beginner]
+
+**Task:** Create a simple interface with a default method.
+
+**Setup:**
+```java
+interface Vehicle {
+    // Abstract method - must be implemented
+    void start();
+    
+    // Default method - has implementation
+    default void honk() {
+        System.out.println("Beep! Beep!");
+    }
+}
+
+class Car implements Vehicle {
+    @Override
+    public void start() {
+        System.out.println("Car engine starts");
+    }
+    // No need to implement honk() - uses default
+}
+
+Vehicle car = new Car();
+car.start();  // Output: Car engine starts
+car.honk();   // Output: Beep! Beep!
+```
+
+**Your Task:** Create a similar interface with 2 default methods:
+```java
+interface Animal {
+    String getName();
+    
+    default void sleep() {
+        ???  // Print that animal is sleeping
+    }
+    
+    default void eat() {
+        ???  // Print that animal is eating
+    }
+}
+```
+
+---
+
+### Exercise 2: Semi-Guided — Static Methods in Interfaces [Intermediate]
+
+**Task:** Create and use a static method in an interface.
+
+**Given:**
+```java
+interface Calculator {
+    // Static method in interface (from Java 8+)
+    static int add(int a, int b) {
+        return a + b;
+    }
+    
+    // Call it on the interface, not on instance
+    Calculator.add(5, 3);  // Result: 8
+}
+```
+
+**Your Task:** Add static methods to a List utility interface:
+```java
+public interface ListUtils {
+    static <T> int countOccurrences(List<T> list, T element) {
+        return (int) list.stream()
+            .filter(e -> e.equals(element))
+            .count();
+    }
+    
+    // Your task: Add another static method that reverses a list
+    static <T> List<T> reverse(List<T> list) {
+        ???  // Reverse the list and return
+    }
+}
+
+// Usage
+List<Integer> nums = Arrays.asList(1, 2, 3, 4);
+List<Integer> reversed = ListUtils.reverse(nums);
+// Expected: [4, 3, 2, 1]
+```
+
+---
+
+### Exercise 3: Challenge — Handle Diamond Problem [Advanced]
+
+**Task:** Resolve multiple inheritance of default methods.
+
+**Challenge Code:**
+```java
+interface A {
+    default void greet() {
+        System.out.println("Hello from A");
+    }
+}
+
+interface B {
+    default void greet() {
+        System.out.println("Hello from B");
+    }
+}
+
+// This class implements both A and B
+// COMPILATION ERROR: Both A and B have default greet() method
+class C implements A, B {
+    // ❌ MUST override greet() to resolve conflict
+    @Override
+    public void greet() {
+        // Option 1: Choose one
+        A.super.greet();  // Call A's version
+        // Option 2: Choose other
+        B.super.greet();  // Call B's version
+        // Option 3: Custom
+        System.out.println("Hello from C");
+    }
+}
+```
+
+**Your Challenge:** Create two interfaces with conflicting default somethingMethods and resolve in implementation class:
+
+---
+
+## 🎨 Architecture Diagram
+
+**Interface Evolution (Why Default/Static Methods):**
+
+```mermaid
+graph LR
+    A["Java 7<br/>Interface: Abstract Only<br/>Adding method = Breaking Change"] --> B["Java 8<br/>Interface: Abstract +<br/>Default + Static<br/>Backward Compatible
+            "]
+    
+    style A fill:#ffccbc
+    style B fill:#c8e6c9
+```
+
+**Default vs Static Methods:**
+
+```mermaid
+graph TD
+    A["Interface Method Types"] --> B["Abstract<br/>No implementation<br/>Must override"]
+    A --> C["Default<br/>Has implementation<br/>Can override"]
+    A --> D["Static<br/>Has implementation<br/>Cannot override<br/>Called on Interface"]
+    
+    style B fill:#ffccbc
+    style C fill:#fff9c4
+    style D fill:#bbdefb
+```
 
 ---
 

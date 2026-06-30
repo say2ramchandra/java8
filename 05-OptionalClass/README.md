@@ -1,6 +1,12 @@
 # Optional Class - Comprehensive Guide
 
 ## 📚 Table of Contents
+- [Learning Objectives](#learning-objectives)
+- [Theory Checkpoints](#theory-checkpoints)
+- [Run Steps](#run-steps)
+- [Verification Steps](#verification-steps)
+- [Expected Outcome](#expected-outcome)
+- [Hands-on Lab](#hands-on-lab)
 - [Introduction](#introduction)
 - [The Null Problem](#the-null-problem)
 - [What is Optional?](#what-is-optional)
@@ -12,6 +18,273 @@
 - [Best Practices](#best-practices)
 - [Anti-Patterns](#anti-patterns)
 - [Quick Reference Card](#quick-reference-card)
+
+---
+## 🎯 Learning Objectives
+
+## 📋 Prerequisites & Next Topics
+After completing this module, you will:
+
+- [ ] Master Optional creation methods: of(), ofNullable(), empty()
+- [ ] Learn to check for values safely without NPE risk
+- [ ] Apply transformation operations: map(), flatMap(), filter()
+- [ ] Understand the difference between get() and orElse() patterns
+- [ ] Recognize and avoid Optional anti-patterns
+- [ ] Write expressive, null-safe code using Optional
+
+---
+
+## ✅ Theory Checkpoints
+
+**Q1: Why is Optional preferred over checking `if (x != null)`?**
+
+A: Optional makes nullability explicit in the type signature. It forces the caller to handle the absent case. With null checks, it's easy to forget a check and get NullPointerException.
+
+**Q2: What's the difference between Optional.of() and Optional.ofNullable()?**
+
+A: `of(value)` throws NPE if value is null (use when you know it's not null). `ofNullable(value)` returns empty Optional if value is null. Use ofNullable when uncertain.
+
+**Q3: When is it appropriate to use Optional.get()?**
+
+A: Only after confirming with isPresent() or when certain a value exists. Better alternatives: use orElse(), orElseGet(), orElseThrow(), or ifPresent() to avoid forgetting the check.
+
+**Q4: How is map() different from flatMap() on Optional?**
+
+A: map() transforms the value inside Optional (T -> R). flatMap() is for when your transformation returns Optional (T -> Optional<R>). flatMap() flattens nested Optionals.
+
+**Q5: What's the biggest Optional anti-pattern?**
+
+A: Using Optional as a field type or method parameter. Optional is designed as a return type only. For fields/parameters, use null or default values. Also avoid: empty().get(), Optional inside collections.
+
+---
+
+## 🚀 Run Steps
+
+### Compile and Run the Demo
+
+**Step 1:** Navigate to the module directory
+```bash
+cd 05-OptionalClass
+```
+
+**Step 2:** Compile the Java file
+```bash
+javac OptionalClass.java
+```
+
+**Step 3:** Run the demo
+```bash
+java OptionalClass
+```
+
+### Alternative: Using IDE
+
+If using an IDE (IntelliJ, Eclipse, VS Code):
+1. Open `OptionalClass.java`
+2. Click the "Run" button (or press `Shift+F10` in IntelliJ)
+3. Output appears in the console
+
+---
+
+## ✅ Verification Steps
+
+**Expected behavior after running:**
+1. Program compiles without errors
+2. Output demonstrates Optional creation methods
+3. Shows comparison between old null-checking and Optional approaches
+4. All transformation operations produce output
+5. No NullPointerExceptions (this is the whole point!)
+
+**Troubleshooting:**
+- **Error: "NoSuchElementException" when calling get()**
+  - Solution: Always check isPresent() first or use orElse()
+- **Output shows NPE**
+  - Solution: Verify you're using ofNullable() for potentially null values
+- **Method not found errors**
+  - Solution: Ensure Java 8+ is being used
+
+---
+
+## 📊 Expected Outcome
+
+When you run `OptionalClass.java`, you should see output like:
+
+```
+=== OPTIONAL CLASS DEMO ===
+
+--- Creating Optionals ---
+[Output from of(), ofNullable(), empty()]
+
+--- Checking for Values ---
+[Output from isPresent(), ifPresent()]
+
+--- Getting Values ---
+[Output from get(), orElse(), orElseGet()]
+
+--- Transforming Values ---
+[Output from map(), flatMap(), filter()]
+
+--- Real-World Examples ---
+[Output showing null-safe code patterns]
+
+--- Comparison: Old vs Optional ---
+[Side-by-side comparison of null checking]
+```
+
+Key points:
+- Clear demonstrations of each Optional operation
+- No NullPointerExceptions
+- Shows practical patterns for null-safety
+
+---
+
+## 📚 Hands-on Lab
+
+### Exercise 1: Guided — Create Optional Objects Safely [Beginner]
+
+**Task:** Create Optional objects using different methods.
+
+**Given:**
+```java
+// DO NOT do this:
+Optional<String> opt1 = Optional.of(null);  // NPE!
+
+// DO this instead:
+Optional<String> opt1 = Optional.ofNullable(null);  // Empty Optional
+Optional<String> opt2 = Optional.of("value");       // Non-empty
+Optional<String> opt3 = Optional.empty();           // Empty
+```
+
+**Your Task:** Given a method that might return null:
+```java
+public String findUser(String id) {
+    // ... might return null
+    return id.isEmpty() ? null : "User: " + id;
+}
+
+// Wrap result in Optional
+Optional<String> user = Optional.???(findUser("123"));
+Optional<String> noUser = Optional.???(findUser(""));
+
+System.out.println(user);   // Optional[User: 123]
+System.out.println(noUser); // Optional.empty
+```
+
+**Hint:** Use `ofNullable()` to safely wrap values that might be null.
+
+---
+
+### Exercise 2: Semi-Guided — Transform with map() and flatMap() [Intermediate]
+
+**Task:** Use Optional.map() to transform values.
+
+**Given:**
+```java
+public Optional<Integer> stringToInt(String s) {
+    try {
+        return Optional.of(Integer.parseInt(s));
+    } catch (NumberFormatException e) {
+        return Optional.empty();
+    }
+}
+
+Optional<String> str = Optional.of("42");
+
+// Transform string to int
+Optional<Integer> num = str.flatMap(this::stringToInt);
+
+System.out.println(num);  // Optional[42]
+```
+
+**Your Task:** Transform name to uppercase using map():
+```java
+Optional<String> name = Optional.of("alice");
+
+Optional<String> upper = name.map(???);
+
+System.out.println(upper);  // Optional[ALICE]
+```
+
+**Hint:** Use `String::toUpperCase` or `s -> s.toUpperCase()`
+
+---
+
+### Exercise 3: Challenge — Complex Optional Chain [Advanced]
+
+**Task:** Build a complex chain of Optional operations.
+
+**Challenge Code:**
+```java
+public class Person {
+    private String name;
+    private Optional<String> email;
+    
+    public Person(String name, String email) {
+        this.name = name;
+        this.email = Optional.ofNullable(email);
+    }
+    public Optional<String> getEmail() { return email; }
+}
+
+// Find a person, get their email, validate it has @sign
+Person person = new Person("Alice", "alice@example.com");
+
+Optional<String> validEmail = Optional.of(person)
+    .flatMap(Person::getEmail)              // Extract email
+    .filter(e -> e.contains("@"))           // Validate
+    .map(String::toLowerCase);              // Normalize
+
+system.out.println(validEmail);  // Optional[alice@example.com]
+
+// Now make person with no email
+Person noEmail = new Person("Bob", null);
+Optional<String> result = Optional.of(noEmail)
+    .flatMap(Person::getEmail)
+    .filter(e -> e.contains("@"))
+    .map(String::toLowerCase)
+    .or(() -> Optional.of("no-email@default.com"));  // Fallback
+
+System.out.println(result);  // Optional[no-email@default.com]
+```
+
+**Your Challenge:** Write similar code that:
+1. Creates an Optional<String> user ID
+2. Filters for length > 3
+3. Maps to uppercase
+4. Provides default if empty
+
+---
+
+## 🎨 Architecture Diagram
+
+**Optional Operations Flow:**
+
+```mermaid
+graph TD
+    A["Optional<T>"] --> B{"Has Value?"}
+    B -->|Yes| C["map/flatMap/filter"]
+    B -->|No| D["skip transform"]
+    C --> E["Result<br/>Optional<R>"]
+    D --> E
+    E --> F{"Terminal Op?"}
+    F -->|get/orElse| G["Retrieve Value"]
+    F -->|ifPresent| H["Execute Side Effect"]
+    
+    style A fill:#c8e6c9
+    style C fill:#bbdefb
+    style D fill:#ffccbc
+    style G fill:#f8bbd0
+```
+
+**Null Safety Progression:**
+
+```mermaid
+graph LR
+    A["Traditional Null<br/>String s = obj.get();\nif s != null ..."] --> B["Optional Way<br/>Optional<String> s<br/>=obj.map(...).do(...)"]
+    
+    style A fill:#ffccbc
+    style B fill:#c8e6c9
+```
 
 ---
 
